@@ -54,9 +54,10 @@ struct ContentView: View {
                 .listStyle(PlainListStyle())
 
                 ZStack {
-                    NavigationLink("", destination: ARViewContainer(selectedPlanets: Array(selectedPlanets)), isActive: $navigateToAR)
-                        .opacity(0)
-                        .frame(width: 0, height: 0)
+                    NavigationLink("", destination: ARViewContainer(selectedPlanets: Array(selectedPlanets))
+                            .edgesIgnoringSafeArea(.all), isActive: $navigateToAR)
+                            .opacity(0)
+                            .frame(width: 0, height: 0)
                     
                     Button(action: proceedButtonAction) {
                         Text("Proceed")
