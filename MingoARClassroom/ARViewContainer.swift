@@ -115,20 +115,44 @@ struct ARViewContainer: UIViewRepresentable {
                 planetCreator.createARPlanet(name: $0.name, data: parent.planetData)
             }
 
-            var xOffset: Float = 0.15
-            for arPlanet in planets {
-                arPlanet.position = SCNVector3(planeAnchor.center.x + xOffset, 0, planeAnchor.center.z)
-                parent.solarSystemNode.addChildNode(arPlanet)
-                xOffset += Float(arPlanet.boundingSphere.radius * 2) + 0.15
+            for planet in parent.planetData where parent.selectedPlanets.contains(planet.name) {
+                if let arPlanet = planetCreator.createARPlanet(name: planet.name, data: parent.planetData) {
+                    
+                    // Convert planet's distanceFromSun to an appropriate scale
+                    let distanceFromSunInScene = Float(planet.distanceFromSun) / 1000.0
+                    arPlanet.position = SCNVector3(distanceFromSunInScene, 0, planeAnchor.center.z)
+                    parent.solarSystemNode.addChildNode(arPlanet)
+                    
+                    // Create and apply rotation action
+                    let rotationDuration = planet.orbitalPeriod / 10.0 // for faster visualization, adjust as needed
+                    let rotateAction = SCNAction.repeatForever(SCNAction.rotate(by: .pi * 2, around: SCNVector3(0, 1, 0), duration: rotationDuration))
+                    arPlanet.runAction(rotateAction)
+                    
+                    // Create orbit (just a visual representation, not for actual rotation)
+                    let orbit = planetCreator.createOrbit(radius: CGFloat(distanceFromSunInScene), colorHex: planet.planetColor)
+                    parent.solarSystemNode.addChildNode(orbit)
+                }
             }
             
             node.addChildNode(parent.solarSystemNode)
             solarSystemPlaced = true
         }
+
+
     }
 }
-
+// TODO: planet orbit not working
 class ARPlanetCreator {
+    func createOrbit(radius: CGFloat, colorHex: String) -> SCNNode {
+        let orbit = SCNTorus(ringRadius: radius, pipeRadius: 0.002)
+        let material = SCNMaterial()
+        material.diffuse.contents = UIColor(hex: colorHex)
+        orbit.materials = [material]
+        
+        let orbitNode = SCNNode(geometry: orbit)
+        return orbitNode
+    }
+    
     func createARPlanet(name: String, data: [Planet]) -> SCNNode? {
         guard let planetInfo = data.first(where: { $0.name == name }) else { return nil }
 
