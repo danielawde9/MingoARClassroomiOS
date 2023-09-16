@@ -67,8 +67,8 @@
 				568EAD482AB45628000E7CC4 /* MingoARClassroomApp.swift */,
 				568EAD4A2AB45628000E7CC4 /* ContentView.swift */,
 				568EAD802AB5A935000E7CC4 /* VisualEffectView.swift */,
-				568EAD822AB5A94B000E7CC4 /* ARSceneWithMenu.swift */,
 				568EAD7E2AB4730C000E7CC4 /* ARViewContainer.swift */,
+				568EAD822AB5A94B000E7CC4 /* ARSceneWithMenu.swift */,
 				568EAD4C2AB45629000E7CC4 /* Assets.xcassets */,
 				568EAD702AB463E8000E7CC4 /* planet_data_with_moon.json */,
 			);

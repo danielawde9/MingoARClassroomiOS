@@ -7,7 +7,7 @@ struct ARViewContainer: UIViewRepresentable {
     private let planetCreator = ARPlanetCreator()
     
     var solarSystemNode: SCNNode = SCNNode()
-
+    
     public init(selectedPlanets: [String]) {
         self.selectedPlanets = selectedPlanets
     }
@@ -15,16 +15,15 @@ struct ARViewContainer: UIViewRepresentable {
     func makeUIView(context: Context) -> ARSCNView {
         let arView = ARSCNView(frame: .zero)
         arView.delegate = context.coordinator
-
+        
         setupARConfiguration(for: arView)
-
         setupGestureRecognizers(for: arView, with: context)
         
         return arView
     }
     
     func updateUIView(_ uiView: ARSCNView, context: Context) {}
-
+    
     func makeCoordinator() -> Coordinator {
         Coordinator(self, planetCreator: planetCreator)
     }
@@ -42,7 +41,6 @@ struct ARViewContainer: UIViewRepresentable {
         configuration.planeDetection = .horizontal
         arView.session.run(configuration)
     }
-
     
     class Coordinator: NSObject, ARSCNViewDelegate {
         var parent: ARViewContainer
@@ -50,7 +48,7 @@ struct ARViewContainer: UIViewRepresentable {
         var planetCreator: ARPlanetCreator
         private var initialSolarSystemScale: SCNVector3 = SCNVector3(1, 1, 1)
         private var selectedPlanetNode: SCNNode?
-
+        
         init(_ parent: ARViewContainer, planetCreator: ARPlanetCreator) {
             self.parent = parent
             self.planetCreator = planetCreator
@@ -64,7 +62,7 @@ struct ARViewContainer: UIViewRepresentable {
             if gesture.state == .began {
                 self.initialSolarSystemScale = parent.solarSystemNode.scale
             }
-
+            
             if gesture.state == .changed {
                 let newScale = SCNVector3(x: initialSolarSystemScale.x * scale,
                                           y: initialSolarSystemScale.y * scale,
@@ -74,50 +72,40 @@ struct ARViewContainer: UIViewRepresentable {
         }
         
         @objc func handleTap(_ gesture: UITapGestureRecognizer) {
-               guard let arView = gesture.view as? ARSCNView else { return }
-
-               let location = gesture.location(in: arView)
-               let hitResults = arView.hitTest(location, options: nil)
-               
-               if let tappedNode = hitResults.first?.node, parent.solarSystemNode.childNodes.contains(tappedNode) {
-                   if tappedNode == selectedPlanetNode { // If the tapped planet is already selected
-                       deselectPlanet(tappedNode)
-                       selectedPlanetNode = nil
-                   } else {
-                       // Deselect the previous planet if one was selected
-                       if let previouslySelected = selectedPlanetNode {
-                           deselectPlanet(previouslySelected)
-                       }
-
-                       selectPlanet(tappedNode)
-                       selectedPlanetNode = tappedNode
-                   }
-               }
-           }
-
-           func selectPlanet(_ node: SCNNode) {
-               // Remove existing selection indicator if it exists
-               node.childNode(withName: "selectionIndicator", recursively: false)?.removeFromParentNode()
-               
-               // Create a slightly larger sphere around the planet to indicate selection
-               let selectionIndicator = SCNSphere(radius: CGFloat(node.boundingSphere.radius + 0.02))
-               
-               // Give it a semi-transparent blue material
-               let material = SCNMaterial()
-               material.diffuse.contents = UIColor.blue.withAlphaComponent(0.4) // Adjust alpha for desired transparency
-               selectionIndicator.materials = [material]
-               
-               let selectionNode = SCNNode(geometry: selectionIndicator)
-               selectionNode.name = "selectionIndicator"
-               
-               // Add the selection sphere as a child node to the planet so it moves with the planet
-               node.addChildNode(selectionNode)
-
-           }
-        func deselectPlanet(_ node: SCNNode) {
-            // Remove the selection indicator from the node
+            guard let arView = gesture.view as? ARSCNView else { return }
+            
+            let location = gesture.location(in: arView)
+            let hitResults = arView.hitTest(location, options: nil)
+            
+            if let tappedNode = hitResults.first?.node, parent.solarSystemNode.childNodes.contains(tappedNode) {
+                if tappedNode == selectedPlanetNode {
+                    deselectPlanet(tappedNode)
+                    selectedPlanetNode = nil
+                } else {
+                    if let previouslySelected = selectedPlanetNode {
+                        deselectPlanet(previouslySelected)
+                    }
+                    selectPlanet(tappedNode)
+                    selectedPlanetNode = tappedNode
+                }
+            }
+        }
+        
+        func selectPlanet(_ node: SCNNode) {
             node.childNode(withName: "selectionIndicator", recursively: false)?.removeFromParentNode()
-
+            
+            let selectionIndicator = SCNSphere(radius: CGFloat(node.boundingSphere.radius + 0.02))
+            let material = SCNMaterial()
+            material.diffuse.contents = UIColor.blue.withAlphaComponent(0.4)
+            selectionIndicator.materials = [material]
+            
+            let selectionNode = SCNNode(geometry: selectionIndicator)
+            selectionNode.name = "selectionIndicator"
+            node.addChildNode(selectionNode)
+        }
+        
+        func deselectPlanet(_ node: SCNNode) {
+            node.childNode(withName: "selectionIndicator", recursively: false)?.removeFromParentNode()
         }
 
         func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
@@ -157,6 +145,7 @@ class ARPlanetCreator {
         planet.materials = [material]
 
         let planetNode = SCNNode(geometry: planet)
+        planetNode.name = name  // Assign the name for hit testing later
 
         // Create the text node for the planet name
         let text = SCNText(string: name, extrusionDepth: 0.02)
@@ -165,12 +154,36 @@ class ARPlanetCreator {
 
         let textNode = SCNNode(geometry: text)
         // Adjust the position of the text node to appear above the planet
-        textNode.position = SCNVector3(0, Float(diameter / 2) + 0.02, 0)
+        textNode.position = SCNVector3(0, 0, 0)
         textNode.scale = SCNVector3(0.2, 0.2, 0.2) // Adjust the scale to appropriate size
 
         // Add the text node as a child of the planet node
         planetNode.addChildNode(textNode)
-
+        
         return planetNode
+    }
+
+}
+
+extension CGFloat {
+    func toRadians() -> CGFloat {
+        return self * .pi / 180.0
+    }
+}
+
+extension UIColor {
+    convenience init(hex: String) {
+        let scanner = Scanner(string: hex.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines))
+        scanner.scanLocation = 1
+        
+        var rgb: UInt64 = 0
+        scanner.scanHexInt64(&rgb)
+        
+        self.init(
+            red: CGFloat((rgb & 0xFF0000) >> 16) / 255.0,
+            green: CGFloat((rgb & 0x00FF00) >> 8) / 255.0,
+            blue: CGFloat(rgb & 0x0000FF) / 255.0,
+            alpha: 1.0
+        )
     }
 }
