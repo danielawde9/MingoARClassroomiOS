@@ -25,6 +25,9 @@ struct ARViewContainer: UIViewRepresentable {
         let pinchGesture = UIPinchGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handlePinch(_:)))
         arView.addGestureRecognizer(pinchGesture)
         
+        let tapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleTap(_:)))
+        arView.addGestureRecognizer(tapGesture)
+
         return arView
     }
     
@@ -39,6 +42,7 @@ struct ARViewContainer: UIViewRepresentable {
         var solarSystemPlaced = false
         var planetCreator: ARPlanetCreator
         private var initialSolarSystemScale: SCNVector3 = SCNVector3(1, 1, 1)
+        private var selectedPlanetNode: SCNNode?
 
         init(_ parent: ARViewContainer, planetCreator: ARPlanetCreator) {
             self.parent = parent
@@ -60,6 +64,53 @@ struct ARViewContainer: UIViewRepresentable {
                                           z: initialSolarSystemScale.z * scale)
                 parent.solarSystemNode.scale = newScale
             }
+        }
+        
+        @objc func handleTap(_ gesture: UITapGestureRecognizer) {
+               guard let arView = gesture.view as? ARSCNView else { return }
+
+               let location = gesture.location(in: arView)
+               let hitResults = arView.hitTest(location, options: nil)
+               
+               if let tappedNode = hitResults.first?.node, parent.solarSystemNode.childNodes.contains(tappedNode) {
+                   if tappedNode == selectedPlanetNode { // If the tapped planet is already selected
+                       deselectPlanet(tappedNode)
+                       selectedPlanetNode = nil
+                   } else {
+                       // Deselect the previous planet if one was selected
+                       if let previouslySelected = selectedPlanetNode {
+                           deselectPlanet(previouslySelected)
+                       }
+
+                       selectPlanet(tappedNode)
+                       selectedPlanetNode = tappedNode
+                   }
+               }
+           }
+
+           func selectPlanet(_ node: SCNNode) {
+               // Remove existing selection indicator if it exists
+               node.childNode(withName: "selectionIndicator", recursively: false)?.removeFromParentNode()
+               
+               // Create a slightly larger sphere around the planet to indicate selection
+               let selectionIndicator = SCNSphere(radius: CGFloat(node.boundingSphere.radius + 0.02))
+               
+               // Give it a semi-transparent blue material
+               let material = SCNMaterial()
+               material.diffuse.contents = UIColor.blue.withAlphaComponent(0.4) // Adjust alpha for desired transparency
+               selectionIndicator.materials = [material]
+               
+               let selectionNode = SCNNode(geometry: selectionIndicator)
+               selectionNode.name = "selectionIndicator"
+               
+               // Add the selection sphere as a child node to the planet so it moves with the planet
+               node.addChildNode(selectionNode)
+
+           }
+        func deselectPlanet(_ node: SCNNode) {
+            // Remove the selection indicator from the node
+            node.childNode(withName: "selectionIndicator", recursively: false)?.removeFromParentNode()
+
         }
 
         func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
