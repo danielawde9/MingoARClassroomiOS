@@ -14,6 +14,8 @@
 		568EAD712AB463E8000E7CC4 /* planet_data_with_moon.json in Resources */ = {isa = PBXBuildFile; fileRef = 568EAD702AB463E8000E7CC4 /* planet_data_with_moon.json */; };
 		568EAD762AB46B14000E7CC4 /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 568EAD752AB46B14000E7CC4 /* ARKit.framework */; };
 		568EAD7F2AB4730C000E7CC4 /* ARViewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568EAD7E2AB4730C000E7CC4 /* ARViewContainer.swift */; };
+		568EAD812AB5A935000E7CC4 /* VisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568EAD802AB5A935000E7CC4 /* VisualEffectView.swift */; };
+		568EAD832AB5A94B000E7CC4 /* ARSceneWithMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568EAD822AB5A94B000E7CC4 /* ARSceneWithMenu.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +27,8 @@
 		568EAD702AB463E8000E7CC4 /* planet_data_with_moon.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = planet_data_with_moon.json; sourceTree = "<group>"; };
 		568EAD752AB46B14000E7CC4 /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = System/Library/Frameworks/ARKit.framework; sourceTree = SDKROOT; };
 		568EAD7E2AB4730C000E7CC4 /* ARViewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARViewContainer.swift; sourceTree = "<group>"; };
+		568EAD802AB5A935000E7CC4 /* VisualEffectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectView.swift; sourceTree = "<group>"; };
+		568EAD822AB5A94B000E7CC4 /* ARSceneWithMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARSceneWithMenu.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +66,8 @@
 				568EAD562AB458A0000E7CC4 /* PlanetModel.swift */,
 				568EAD482AB45628000E7CC4 /* MingoARClassroomApp.swift */,
 				568EAD4A2AB45628000E7CC4 /* ContentView.swift */,
+				568EAD802AB5A935000E7CC4 /* VisualEffectView.swift */,
+				568EAD822AB5A94B000E7CC4 /* ARSceneWithMenu.swift */,
 				568EAD4C2AB45629000E7CC4 /* Assets.xcassets */,
 				568EAD702AB463E8000E7CC4 /* planet_data_with_moon.json */,
 				568EAD7E2AB4730C000E7CC4 /* ARViewContainer.swift */,
@@ -147,7 +153,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				568EAD812AB5A935000E7CC4 /* VisualEffectView.swift in Sources */,
 				568EAD4B2AB45628000E7CC4 /* ContentView.swift in Sources */,
+				568EAD832AB5A94B000E7CC4 /* ARSceneWithMenu.swift in Sources */,
 				568EAD7F2AB4730C000E7CC4 /* ARViewContainer.swift in Sources */,
 				568EAD492AB45628000E7CC4 /* MingoARClassroomApp.swift in Sources */,
 				568EAD572AB458A0000E7CC4 /* PlanetModel.swift in Sources */,
