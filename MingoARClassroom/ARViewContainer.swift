@@ -77,7 +77,7 @@ struct ARViewContainer: UIViewRepresentable {
             let location = gesture.location(in: arView)
             let hitResults = arView.hitTest(location, options: nil)
             
-            if let tappedNode = hitResults.first?.node, parent.solarSystemNode.childNodes.contains(tappedNode) {
+            if let tappedNode = hitResults.first?.node, tappedNode.name != nil {
                 if tappedNode == selectedPlanetNode {
                     deselectPlanet(tappedNode)
                     selectedPlanetNode = nil
@@ -111,8 +111,8 @@ struct ARViewContainer: UIViewRepresentable {
         func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
             guard !solarSystemPlaced, let planeAnchor = anchor as? ARPlaneAnchor else { return }
 
-            let planets = parent.selectedPlanets.compactMap {
-                planetCreator.createARPlanet(name: $0, data: parent.planetData)
+            let planets = parent.planetData.filter { parent.selectedPlanets.contains($0.name) }.compactMap {
+                planetCreator.createARPlanet(name: $0.name, data: parent.planetData)
             }
 
             var xOffset: Float = 0.15
