@@ -15,19 +15,11 @@ struct ARViewContainer: UIViewRepresentable {
     func makeUIView(context: Context) -> ARSCNView {
         let arView = ARSCNView(frame: .zero)
         arView.delegate = context.coordinator
-        
-        // Setup AR configuration with horizontal plane detection
-        let configuration = ARWorldTrackingConfiguration()
-        configuration.planeDetection = .horizontal
-        arView.session.run(configuration)
-        
-        // Add pinch gesture recognizer
-        let pinchGesture = UIPinchGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handlePinch(_:)))
-        arView.addGestureRecognizer(pinchGesture)
-        
-        let tapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleTap(_:)))
-        arView.addGestureRecognizer(tapGesture)
 
+        setupARConfiguration(for: arView)
+
+        setupGestureRecognizers(for: arView, with: context)
+        
         return arView
     }
     
@@ -36,6 +28,21 @@ struct ARViewContainer: UIViewRepresentable {
     func makeCoordinator() -> Coordinator {
         Coordinator(self, planetCreator: planetCreator)
     }
+    
+    func setupGestureRecognizers(for arView: ARSCNView, with context: Context) {
+        let pinchGesture = UIPinchGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handlePinch(_:)))
+        arView.addGestureRecognizer(pinchGesture)
+        
+        let tapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleTap(_:)))
+        arView.addGestureRecognizer(tapGesture)
+    }
+    
+    func setupARConfiguration(for arView: ARSCNView) {
+        let configuration = ARWorldTrackingConfiguration()
+        configuration.planeDetection = .horizontal
+        arView.session.run(configuration)
+    }
+
     
     class Coordinator: NSObject, ARSCNViewDelegate {
         var parent: ARViewContainer
@@ -149,6 +156,21 @@ class ARPlanetCreator {
         }
         planet.materials = [material]
 
-        return SCNNode(geometry: planet)
+        let planetNode = SCNNode(geometry: planet)
+
+        // Create the text node for the planet name
+        let text = SCNText(string: name, extrusionDepth: 0.02)
+        text.font = UIFont(name: "Arial", size: 0.1)
+        text.firstMaterial?.diffuse.contents = UIColor.white
+
+        let textNode = SCNNode(geometry: text)
+        // Adjust the position of the text node to appear above the planet
+        textNode.position = SCNVector3(0, Float(diameter / 2) + 0.02, 0)
+        textNode.scale = SCNVector3(0.2, 0.2, 0.2) // Adjust the scale to appropriate size
+
+        // Add the text node as a child of the planet node
+        planetNode.addChildNode(textNode)
+
+        return planetNode
     }
 }
