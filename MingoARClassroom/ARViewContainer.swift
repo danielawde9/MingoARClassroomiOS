@@ -5,7 +5,7 @@ struct ARViewContainer: UIViewRepresentable {
     var selectedPlanets: [String]
     private var planetData: [Planet] = loadPlanetData()
     private let planetCreator = ARPlanetCreator()
-
+    
     var solarSystemNode: SCNNode = SCNNode()
     
     // Initializer for the struct
@@ -100,9 +100,9 @@ struct ARViewContainer: UIViewRepresentable {
             
             let location = gesture.location(in: arView)
             let hitResults = arView.hitTest(location, options: [SCNHitTestOption.categoryBitMask: planetCategory])
-
+            
             if let tappedNode = hitResults.first?.node, tappedNode.name != nil {
-
+                
                 if tappedNode == selectedPlanetNode {
                     deselectPlanet(tappedNode)
                     selectedPlanetNode = nil
@@ -140,20 +140,20 @@ struct ARViewContainer: UIViewRepresentable {
             for planet in parent.planetData where parent.selectedPlanets.contains(planet.name) {
                 if let planetNode = planetCreator.createARPlanet(name: planet.name, data: planet) { // Pass single planet
                     
-          
+                    
                     
                     planetCreator.applySelfRotation(planetNode: planetNode, planet: planet)
                     planetCreator.animateRevolution(planetNode: planetNode, planet: planet)
                     
                     let orbit = planetCreator.createOrbitForPlanet(planet: planet)
-
+                    
                     planetNode.categoryBitMask = planetCategory
                     orbit.categoryBitMask = orbitCategory
-
+                    
                     
                     parent.solarSystemNode.addChildNode(planetNode)
                     parent.solarSystemNode.addChildNode(orbit)
-
+                    
                 }
             }
             
@@ -167,9 +167,9 @@ struct ARViewContainer: UIViewRepresentable {
 class ARPlanetCreator {
     var rotationCounts: [String: Int] = [:]
     var revolutionCounts: [String: Int] = [:]
-
+    
     var speedMultiplier: Float = 86400.0
-
+    
     func hexStringToUIColor(hex: String) -> UIColor {
         var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
         hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
@@ -218,7 +218,7 @@ class ARPlanetCreator {
         
         planetNode.runAction(continuousRotation)
     }
-
+    
     
     // 3. Revolution around the Sun
     func animateRevolution(planetNode: SCNNode, planet: Planet) {
@@ -243,8 +243,8 @@ class ARPlanetCreator {
         
         planetNode.runAction(continuousRevolution)
     }
-
     
+    // TODO: add color orbit 
     func calculateOrbitParameters(planet: Planet, angle: Float) -> (x: Float, y: Float, z: Float, semiMajorAxis: CGFloat, semiMinorAxis: CGFloat) {
         let radians = angle * .pi / 180.0
         
