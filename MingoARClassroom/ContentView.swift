@@ -77,6 +77,8 @@ struct ContentView: View {
                 }
             }
             .padding()
+            .onAppear(perform: setDefaultSelectedPlanets) // Call the function when the view appears
+
         }
     }
 
@@ -86,6 +88,15 @@ struct ContentView: View {
                 showAlert = true
             } else {
                 navigateToAR = true
+            }
+        }
+    }
+    
+    // This is the new function to set default selected planets
+    func setDefaultSelectedPlanets() {
+        for planet in planets {
+            if planet.name != "Sun" {
+                selectedPlanets.insert(planet.id)
             }
         }
     }
