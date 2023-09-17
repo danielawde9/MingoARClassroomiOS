@@ -5,7 +5,7 @@ struct ARViewContainer: UIViewRepresentable {
     var selectedPlanets: [String]
     private var planetData: [Planet] = loadPlanetData()
     private let planetCreator = ARPlanetCreator()
-    
+
     var solarSystemNode: SCNNode = SCNNode()
     
     public init(selectedPlanets: [String]) {
@@ -48,6 +48,9 @@ struct ARViewContainer: UIViewRepresentable {
         var planetCreator: ARPlanetCreator
         private var initialSolarSystemScale: SCNVector3 = SCNVector3(1, 1, 1)
         private var selectedPlanetNode: SCNNode?
+        let planetCategory: Int = 1 << 1
+        let orbitCategory: Int = 1 << 2
+        
         
         init(_ parent: ARViewContainer, planetCreator: ARPlanetCreator) {
             self.parent = parent
@@ -75,9 +78,11 @@ struct ARViewContainer: UIViewRepresentable {
             guard let arView = gesture.view as? ARSCNView else { return }
             
             let location = gesture.location(in: arView)
-            let hitResults = arView.hitTest(location, options: nil)
-            
+            let hitResults = arView.hitTest(location, options: [SCNHitTestOption.categoryBitMask: planetCategory])
+
             if let tappedNode = hitResults.first?.node, tappedNode.name != nil {
+                print("Tapped on: \(tappedNode.name ?? "unknown node")")
+
                 if tappedNode == selectedPlanetNode {
                     deselectPlanet(tappedNode)
                     selectedPlanetNode = nil
@@ -113,11 +118,21 @@ struct ARViewContainer: UIViewRepresentable {
             
             for planet in parent.planetData where parent.selectedPlanets.contains(planet.name) {
                 if let planetNode = planetCreator.createARPlanet(name: planet.name, data: planet) { // Pass single planet
+                    
+          
+                    
                     planetCreator.applySelfRotation(planetNode: planetNode, planet: planet)
                     planetCreator.animateRevolution(planetNode: planetNode, planet: planet)
+                    
                     let orbit = planetCreator.createOrbitForPlanet(planet: planet)
-                    parent.solarSystemNode.addChildNode(orbit)
+
+                    planetNode.categoryBitMask = planetCategory
+                    orbit.categoryBitMask = orbitCategory
+
+                    
                     parent.solarSystemNode.addChildNode(planetNode)
+                    parent.solarSystemNode.addChildNode(orbit)
+
                 }
             }
             
@@ -176,17 +191,26 @@ class ARPlanetCreator {
     
     
     // 3. Revolution around the Sun
+    var currentAngles: [String: Float] = [:]
+
     func animateRevolution(planetNode: SCNNode, planet: Planet) {
         let duration = TimeInterval(planet.orbitalPeriod) / TimeInterval(speedMultiplier)
-
+        
         let revolutionAction = SCNAction.customAction(duration: duration) { node, elapsedTime in
-            let angle = Float(elapsedTime) / Float(duration) * 2 * Float.pi
+            let previousAngle = self.currentAngles[planet.name] ?? 0
+            let deltaAngle = Float(elapsedTime) / Float(duration) * 2 * Float.pi
+            let angle = previousAngle + deltaAngle
             node.position = self.positionOnOrbit(planet: planet, angle: angle)
+            
+            if elapsedTime >= CGFloat(duration) {
+                self.currentAngles[planet.name] = angle.truncatingRemainder(dividingBy: 2 * .pi)
+            }
         }
         
         let continuousRevolution = SCNAction.repeatForever(revolutionAction)
         planetNode.runAction(continuousRevolution)
     }
+
     
     func calculateOrbitParameters(planet: Planet, angle: Float) -> (x: Float, y: Float, z: Float, semiMajorAxis: CGFloat, semiMinorAxis: CGFloat) {
         let radians = angle * .pi / 180.0
@@ -203,8 +227,6 @@ class ARPlanetCreator {
         // Apply the orbital inclination
         let y = sin(eccentricAnomaly) * semiMinorAxis * tan(planet.orbitalInclination * .pi / 180.0)
         
- 
-
         
         return (x, y, z, CGFloat(semiMajorAxis), CGFloat(semiMinorAxis))
     }
@@ -240,9 +262,7 @@ class ARPlanetCreator {
     func positionOnOrbit(planet: Planet, angle: Float) -> SCNVector3 {
         let orbitParams = calculateOrbitParameters(planet: planet, angle: angle)
         if planet.name == "Earth" {
-            print("Earth semi-major axis: \(orbitParams.semiMajorAxis)")
-            print("Earth semi-minor axis: \(orbitParams.semiMinorAxis)")
-            print("Earth x: \(orbitParams.x), y: \(orbitParams.y), z: \(orbitParams.z)")
+//            print("Earth x: \(orbitParams.x), y: \(orbitParams.y), z: \(orbitParams.z)")
         }
         return SCNVector3(orbitParams.x , orbitParams.y, orbitParams.z)
     }
