@@ -195,18 +195,17 @@ class ARPlanetCreator {
 
     func animateRevolution(planetNode: SCNNode, planet: Planet) {
         let duration = TimeInterval(planet.orbitalPeriod) / TimeInterval(speedMultiplier)
+        let numberOfSteps = 360
+        var actions: [SCNAction] = []
         
-        let revolutionAction = SCNAction.customAction(duration: duration) { node, elapsedTime in
-            let previousAngle = self.currentAngles[planet.name] ?? 0
-            let deltaAngle = Float(elapsedTime) / Float(duration) * 2 * Float.pi
-            let angle = previousAngle + deltaAngle
-            node.position = self.positionOnOrbit(planet: planet, angle: angle)
-            
-            if elapsedTime >= CGFloat(duration) {
-                self.currentAngles[planet.name] = angle.truncatingRemainder(dividingBy: 2 * .pi)
-            }
+        for angle in stride(from: 0, to: 360, by: 360/numberOfSteps) {
+            let nextPosition = positionOnOrbit(planet: planet, angle: Float(angle))
+            let moveAction = SCNAction.move(to: nextPosition, duration: duration / Double(numberOfSteps))
+            actions.append(moveAction)
         }
         
+        let revolutionAction = SCNAction.sequence(actions)
+      
         let continuousRevolution = SCNAction.repeatForever(revolutionAction)
         planetNode.runAction(continuousRevolution)
     }
@@ -262,7 +261,7 @@ class ARPlanetCreator {
     func positionOnOrbit(planet: Planet, angle: Float) -> SCNVector3 {
         let orbitParams = calculateOrbitParameters(planet: planet, angle: angle)
         if planet.name == "Earth" {
-//            print("Earth x: \(orbitParams.x), y: \(orbitParams.y), z: \(orbitParams.z)")
+            print("Earth x: \(orbitParams.x), y: \(orbitParams.y), z: \(orbitParams.z)")
         }
         return SCNVector3(orbitParams.x , orbitParams.y, orbitParams.z)
     }
