@@ -124,17 +124,30 @@ struct ARViewContainer: UIViewRepresentable {
 }
 
 class ARPlanetCreator {
+    func hexStringToUIColor(hex: String) -> UIColor {
+        var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
+        hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
+
+        var rgb: UInt64 = 0
+
+        Scanner(string: hexSanitized).scanHexInt64(&rgb)
+        let red = CGFloat((rgb & 0xFF0000) >> 16) / 255.0
+        let green = CGFloat((rgb & 0x00FF00) >> 8) / 255.0
+        let blue = CGFloat(rgb & 0x0000FF) / 255.0
+
+        return UIColor(red: red, green: green, blue: blue, alpha: 1.0)
+    }
+
     func createOrbit(radius: CGFloat, colorHex: String) -> SCNNode {
-        let orbit = SCNTorus(ringRadius: radius, pipeRadius: 0.002) // Adjust pipeRadius based on desired thickness of the orbit line
+        let orbit = SCNTorus(ringRadius: radius, pipeRadius: 0.002)
         let material = SCNMaterial()
-        material.diffuse.contents = UIColor(named: colorHex)
+        material.diffuse.contents = hexStringToUIColor(hex: colorHex) // Adjusted this line
         orbit.materials = [material]
 
         let orbitNode = SCNNode(geometry: orbit)
         return orbitNode
     }
 
-    
     func orbitingNode(forPlanet planetInfo: Planet) -> SCNNode {
         let orbitNode = SCNNode()
         
