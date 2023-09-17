@@ -8,10 +8,12 @@ struct ARViewContainer: UIViewRepresentable {
 
     var solarSystemNode: SCNNode = SCNNode()
     
+    // Initializer for the struct
     public init(selectedPlanets: [String]) {
         self.selectedPlanets = selectedPlanets
     }
     
+    // Configure and return the ARSCNView
     func makeUIView(context: Context) -> ARSCNView {
         let arView = ARSCNView(frame: .zero)
         arView.delegate = context.coordinator
@@ -22,12 +24,15 @@ struct ARViewContainer: UIViewRepresentable {
         return arView
     }
     
+    // Required method for UIViewRepresentable to update the ARSCNView's state
     func updateUIView(_ uiView: ARSCNView, context: Context) {}
     
+    // Create and return the Coordinator class which will handle interactions with the ARSCNView
     func makeCoordinator() -> Coordinator {
         Coordinator(self, planetCreator: planetCreator)
     }
     
+    // Set up gesture recognizers for the ARSCNView
     func setupGestureRecognizers(for arView: ARSCNView, with context: Context) {
         let pinchGesture = UIPinchGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handlePinch(_:)))
         arView.addGestureRecognizer(pinchGesture)
@@ -36,22 +41,38 @@ struct ARViewContainer: UIViewRepresentable {
         arView.addGestureRecognizer(tapGesture)
     }
     
+    // Configure the AR session to detect horizontal planes
     func setupARConfiguration(for arView: ARSCNView) {
         let configuration = ARWorldTrackingConfiguration()
         configuration.planeDetection = .horizontal
         arView.session.run(configuration)
     }
     
+    // The Coordinator class acts as the bridge between SwiftUI and UIKit, handling interactions and updates.
     class Coordinator: NSObject, ARSCNViewDelegate {
+        
+        // Reference to the parent ARViewContainer to access its properties and methods.
         var parent: ARViewContainer
+        
+        // A boolean to track if the solar system has been placed in the AR scene.
         var solarSystemPlaced = false
+        
+        // An instance of ARPlanetCreator to assist in creating and animating planets.
         var planetCreator: ARPlanetCreator
+        
+        // Initial scale of the solar system, used to reset after a pinch gesture.
         private var initialSolarSystemScale: SCNVector3 = SCNVector3(1, 1, 1)
+        
+        // Reference to the currently selected planet node.
         private var selectedPlanetNode: SCNNode?
+        
+        // Category masks for hit testing.
+        // 1 << 1 is a bitwise operation that shifts the number 1 one position to the left, resulting in the binary number 10, which is 2 in decimal.
+        // 1 << 2 shifts the number 1 two positions to the left, resulting in the binary number 100, which is 4 in decimal.
         let planetCategory: Int = 1 << 1
         let orbitCategory: Int = 1 << 2
         
-        
+        // Initializer for the Coordinator.
         init(_ parent: ARViewContainer, planetCreator: ARPlanetCreator) {
             self.parent = parent
             self.planetCreator = planetCreator
@@ -81,7 +102,6 @@ struct ARViewContainer: UIViewRepresentable {
             let hitResults = arView.hitTest(location, options: [SCNHitTestOption.categoryBitMask: planetCategory])
 
             if let tappedNode = hitResults.first?.node, tappedNode.name != nil {
-                print("Tapped on: \(tappedNode.name ?? "unknown node")")
 
                 if tappedNode == selectedPlanetNode {
                     deselectPlanet(tappedNode)
@@ -113,6 +133,7 @@ struct ARViewContainer: UIViewRepresentable {
             node.childNode(withName: "selectionIndicator", recursively: false)?.removeFromParentNode()
         }
         
+        // This delegate method is called when a new node has been added to the AR scene.
         func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
             guard !solarSystemPlaced, let planeAnchor = anchor as? ARPlaneAnchor else { return }
             
@@ -200,7 +221,6 @@ class ARPlanetCreator {
 
     
     // 3. Revolution around the Sun
-
     func animateRevolution(planetNode: SCNNode, planet: Planet) {
         let duration = TimeInterval(planet.orbitalPeriod) / TimeInterval(speedMultiplier)
         let numberOfSteps = 360
