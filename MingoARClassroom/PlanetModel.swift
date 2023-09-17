@@ -3,22 +3,22 @@ import Foundation
 struct Planet: Identifiable, Decodable {
     var id: String { name }
     let name: String
-    let diameter: Double
-    var rotationPeriod: Double
-    let lengthOfDay: Double
-    var distanceFromSun: Double
-    var perihelion: Double
-    var aphelion: Double
-    var orbitalPeriod: Double
-    let orbitalVelocity: Double
-    let orbitalInclination: Double
-    let orbitalEccentricity: Double
-    let obliquityToOrbit: Double
+    var diameter: Float
+    var rotationPeriod: Float
+    let lengthOfDay: Float
+    var distanceFromSun: Float
+    var perihelion: Float
+    var aphelion: Float
+    var orbitalPeriod: Float
+    let orbitalVelocity: Float
+    let orbitalInclination: Float
+    let orbitalEccentricity: Float
+    let obliquityToOrbit: Float
     let planetColor: String
     let moons: [Moon]
     let rings: [Ring]
     let pointsOfInterest: [PointOfInterest]?
-    var orbitalEccentricitySquared: Double { orbitalEccentricity * orbitalEccentricity }
+    var orbitalEccentricitySquared: Float { orbitalEccentricity * orbitalEccentricity }
     var orbitProgress: Float
     var rotationProgress: Float
     var completedOrbits: Int
@@ -28,24 +28,24 @@ struct Planet: Identifiable, Decodable {
 struct Moon: Identifiable, Decodable {
     var id: String { name }
     let name: String
-    let diameter: Double
-    let rotationPeriod: Double
-    let lengthOfDay: Double
-    let distanceFromPlanet: Double
-    let orbitalPeriod: Double
+    let diameter: Float
+    let rotationPeriod: Float
+    let lengthOfDay: Float
+    let distanceFromPlanet: Float
+    let orbitalPeriod: Float
 }
 
 struct Ring: Decodable {
     let name: String
-    let innerRadius: Double
-    let outerRadius: Double
+    let innerRadius: Float
+    let outerRadius: Float
 }
 
 struct PointOfInterest: Decodable {
     let name: String
     let description: String
-    let latitude: Double
-    let longitude: Double
+    let latitude: Float
+    let longitude: Float
 }
 
 func loadPlanetData() -> [Planet] {
@@ -56,21 +56,35 @@ func loadPlanetData() -> [Planet] {
 
     do {
         let data = try Data(contentsOf: url)
-        var decodedData = try JSONDecoder().decode([String: [Planet]].self, from: data)
+        let decodedData = try JSONDecoder().decode([String: [Planet]].self, from: data)
         guard var planets = decodedData["planets"] else { return [] }
         
         // Applying the conversions
         for (index, planet) in planets.enumerated() {
             planets[index].rotationPeriod *= 3600 // Convert hours to seconds
             planets[index].orbitalPeriod *= 86400 // Convert days to seconds
-            planets[index].perihelion *= 1e6 // Convert 10^6 km to km
-            planets[index].aphelion *= 1e6 // Convert 10^6 km to km
-            planets[index].distanceFromSun *= 1e6 // Convert 10^6 km to km
+            planets[index].perihelion /= 1000 // Convert 10^6 km
+            planets[index].aphelion /= 1000 // Convert 10^6 km
+            planets[index].distanceFromSun /= 1000 // Convert 10^6 km
+            planets[index].diameter /= 1_000_000 //
+            
         }
-        print(planets)
         return planets
     } catch {
         print("Error decoding JSON: \(error)")
         return []
     }
 }
+/*
+diameter in km
+rotation period in hours
+lenght of day also in hours
+distance from sun 10^6 km
+Perihelion (10^6 km)
+Aphelion (10^6 km)
+Orbital Period (days)
+Orbital Velocity (km/s)
+Orbital Inclination (degrees)
+Obliquity to Orbit (degrees)
+rotation speed degrees per second
+*/
