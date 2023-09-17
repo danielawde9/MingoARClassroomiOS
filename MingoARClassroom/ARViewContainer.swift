@@ -139,7 +139,7 @@ class ARPlanetCreator {
     }
 
     func createOrbit(radius: CGFloat, colorHex: String) -> SCNNode {
-        let orbit = SCNTorus(ringRadius: radius, pipeRadius: 0.002)
+        let orbit = SCNTorus(ringRadius: radius, pipeRadius: 0.0002)
         let material = SCNMaterial()
         material.diffuse.contents = hexStringToUIColor(hex: colorHex) // Adjusted this line
         orbit.materials = [material]
@@ -181,7 +181,7 @@ class ARPlanetCreator {
 
         let diameter = CGFloat(planetInfo.diameter) / 1_000_000.0
         let planet = SCNSphere(radius: diameter / 2)
-        planet.segmentCount = 150
+        planet.segmentCount = 550
         
         let material = SCNMaterial()
         material.diffuse.contents = UIImage(named: planetInfo.name)
