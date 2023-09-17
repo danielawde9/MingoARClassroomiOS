@@ -144,8 +144,9 @@ struct ARViewContainer: UIViewRepresentable {
 }
 
 class ARPlanetCreator {
-    var earthSelfRotationCount: Int = 0
-    var earthRevolutionCount: Int = 0
+    var rotationCounts: [String: Int] = [:]
+    var revolutionCounts: [String: Int] = [:]
+
     var speedMultiplier: Float = 86400.0
 
     func hexStringToUIColor(hex: String) -> UIColor {
@@ -185,13 +186,20 @@ class ARPlanetCreator {
     func applySelfRotation(planetNode: SCNNode, planet: Planet) {
         let adjustedRotationPeriod = planet.rotationPeriod / speedMultiplier
         let rotationAction = SCNAction.rotateBy(x: 0, y: CGFloat(2 * Float.pi), z: 0, duration: TimeInterval(adjustedRotationPeriod))
-        let continuousRotation = SCNAction.repeatForever(rotationAction)
+        
+        let rotationCompletionAction = SCNAction.run { _ in
+            self.rotationCounts[planet.name, default: 0] += 1
+            print("\(planet.name) has completed \(self.rotationCounts[planet.name]!) self-rotations.")
+        }
+        
+        let sequence = SCNAction.sequence([rotationAction, rotationCompletionAction])
+        let continuousRotation = SCNAction.repeatForever(sequence)
+        
         planetNode.runAction(continuousRotation)
     }
-    
+
     
     // 3. Revolution around the Sun
-    var currentAngles: [String: Float] = [:]
 
     func animateRevolution(planetNode: SCNNode, planet: Planet) {
         let duration = TimeInterval(planet.orbitalPeriod) / TimeInterval(speedMultiplier)
@@ -204,9 +212,15 @@ class ARPlanetCreator {
             actions.append(moveAction)
         }
         
+        let revolutionCompletionAction = SCNAction.run { _ in
+            self.revolutionCounts[planet.name, default: 0] += 1
+            print("\(planet.name) has completed \(self.revolutionCounts[planet.name]!) revolutions around the Sun.")
+        }
+        actions.append(revolutionCompletionAction)
+        
         let revolutionAction = SCNAction.sequence(actions)
-      
         let continuousRevolution = SCNAction.repeatForever(revolutionAction)
+        
         planetNode.runAction(continuousRevolution)
     }
 

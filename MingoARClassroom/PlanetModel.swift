@@ -19,8 +19,6 @@ struct Planet: Identifiable, Decodable {
     let rings: [Ring]
     let pointsOfInterest: [PointOfInterest]?
     var orbitalEccentricitySquared: Float { orbitalEccentricity * orbitalEccentricity }
-    var completedOrbits: Int
-    var completedSelfRotations: Int
 }
 
 struct Moon: Identifiable, Decodable {
