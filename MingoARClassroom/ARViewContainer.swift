@@ -3,7 +3,7 @@ import ARKit
 
 struct ARViewContainer: UIViewRepresentable {
     var selectedPlanets: [String]
-    private var planetData: [Planet] = loadPlanetData()
+    private var planetData: [Planet] = loadPlanetData() // This function was not provided; please make sure it exists
     private let planetCreator = ARPlanetCreator()
     
     var solarSystemNode: SCNNode = SCNNode()
@@ -110,104 +110,84 @@ struct ARViewContainer: UIViewRepresentable {
 
         func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
             guard !solarSystemPlaced, let planeAnchor = anchor as? ARPlaneAnchor else { return }
-
-            let planets = parent.planetData.filter { parent.selectedPlanets.contains($0.name) }.compactMap {
-                planetCreator.createARPlanet(name: $0.name, data: parent.planetData)
-            }
-
+            
             for planet in parent.planetData where parent.selectedPlanets.contains(planet.name) {
-                if let arPlanet = planetCreator.createARPlanet(name: planet.name, data: parent.planetData) {
-                    
-                    // Convert planet's distanceFromSun to an appropriate scale
-                    let distanceFromSunInScene = Float(planet.distanceFromSun) / 1000.0
-                    arPlanet.position = SCNVector3(distanceFromSunInScene, 0, planeAnchor.center.z)
-                    parent.solarSystemNode.addChildNode(arPlanet)
-                    
-                    // Create and apply rotation action
-                    let rotationDuration = planet.orbitalPeriod / 10.0 // for faster visualization, adjust as needed
-                    let rotateAction = SCNAction.repeatForever(SCNAction.rotate(by: .pi * 2, around: SCNVector3(0, 1, 0), duration: rotationDuration))
-                    arPlanet.runAction(rotateAction)
-                    
-                    // Create orbit (just a visual representation, not for actual rotation)
-                    let orbit = planetCreator.createOrbit(radius: CGFloat(distanceFromSunInScene), colorHex: planet.planetColor)
-                    parent.solarSystemNode.addChildNode(orbit)
-                }
+                
+                let orbitNode = planetCreator.orbitingNode(forPlanet: planet)
+                parent.solarSystemNode.addChildNode(orbitNode)
             }
             
             node.addChildNode(parent.solarSystemNode)
             solarSystemPlaced = true
         }
-
-
     }
 }
-// TODO: planet orbit not working
+
 class ARPlanetCreator {
     func createOrbit(radius: CGFloat, colorHex: String) -> SCNNode {
-        let orbit = SCNTorus(ringRadius: radius, pipeRadius: 0.002)
+        let orbit = SCNTorus(ringRadius: radius, pipeRadius: 0.002) // Adjust pipeRadius based on desired thickness of the orbit line
         let material = SCNMaterial()
-        material.diffuse.contents = UIColor(hex: colorHex)
+        material.diffuse.contents = UIColor(named: colorHex)
         orbit.materials = [material]
-        
+
         let orbitNode = SCNNode(geometry: orbit)
         return orbitNode
     }
+
+    
+    func orbitingNode(forPlanet planetInfo: Planet) -> SCNNode {
+        let orbitNode = SCNNode()
+        
+        // Convert planet's distanceFromSun to an appropriate scale
+        let distanceFromSunInScene = CGFloat(planetInfo.distanceFromSun) / 1000.0
+
+        // Create and add visual orbit ring
+        let orbitRing = createOrbit(radius: distanceFromSunInScene, colorHex: planetInfo.planetColor)
+        orbitNode.addChildNode(orbitRing)
+        
+        // Set the planet's position in the orbit node
+        let planetNode = createARPlanet(name: planetInfo.name, data: [planetInfo])
+        planetNode?.position = SCNVector3(distanceFromSunInScene, 0, 0)
+        orbitNode.addChildNode(planetNode!)
+
+        // Orbit around the Y-axis of the Sun
+        let orbitalDuration = planetInfo.orbitalPeriod / 10.0
+        let orbitAction = SCNAction.repeatForever(SCNAction.rotate(by: .pi * 2, around: SCNVector3(0, 1, 0), duration: orbitalDuration))
+        orbitNode.runAction(orbitAction)
+
+        // Apply inclination
+        orbitNode.rotation = SCNVector4(1, 0, 0, Float(planetInfo.orbitalInclination).toRadians())
+        orbitNode.eulerAngles.x = Float(planetInfo.orbitalInclination).toRadians()
+
+        return orbitNode
+    }
+
     
     func createARPlanet(name: String, data: [Planet]) -> SCNNode? {
         guard let planetInfo = data.first(where: { $0.name == name }) else { return nil }
 
         let diameter = CGFloat(planetInfo.diameter) / 1_000_000.0
         let planet = SCNSphere(radius: diameter / 2)
+        planet.segmentCount = 150
         
         let material = SCNMaterial()
-        if let image = UIImage(named: name) {
-            print("Loaded image for \(name)")
-            material.diffuse.contents = image
-        } else {
-            print("Failed to load image for \(name)")
-        }
+        material.diffuse.contents = UIImage(named: planetInfo.name)
         planet.materials = [material]
-
-        let planetNode = SCNNode(geometry: planet)
-        planetNode.name = name  // Assign the name for hit testing later
-
-        // Create the text node for the planet name
-        let text = SCNText(string: name, extrusionDepth: 0.02)
-        text.font = UIFont(name: "Arial", size: 0.1)
-        text.firstMaterial?.diffuse.contents = UIColor.white
-
-        let textNode = SCNNode(geometry: text)
-        // Adjust the position of the text node to appear above the planet
-        textNode.position = SCNVector3(0, 0, 0)
-        textNode.scale = SCNVector3(0.2, 0.2, 0.2) // Adjust the scale to appropriate size
-
-        // Add the text node as a child of the planet node
-        planetNode.addChildNode(textNode)
         
+        let planetNode = SCNNode(geometry: planet)
+        planetNode.name = planetInfo.name
+
+        // Planet self rotation
+        let selfRotationDuration = planetInfo.rotationPeriod / 10.0
+        let selfRotationAction = SCNAction.repeatForever(SCNAction.rotate(by: .pi * 2, around: SCNVector3(0, 1, 0), duration: selfRotationDuration))
+        planetNode.runAction(selfRotationAction)
+
         return planetNode
     }
-
 }
 
-extension CGFloat {
-    func toRadians() -> CGFloat {
-        return self * .pi / 180.0
-    }
-}
-
-extension UIColor {
-    convenience init(hex: String) {
-        let scanner = Scanner(string: hex.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines))
-        scanner.scanLocation = 1
-        
-        var rgb: UInt64 = 0
-        scanner.scanHexInt64(&rgb)
-        
-        self.init(
-            red: CGFloat((rgb & 0xFF0000) >> 16) / 255.0,
-            green: CGFloat((rgb & 0x00FF00) >> 8) / 255.0,
-            blue: CGFloat(rgb & 0x0000FF) / 255.0,
-            alpha: 1.0
-        )
+extension Float {
+    func toRadians() -> Float {
+        return self * .pi / 180
     }
 }
