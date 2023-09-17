@@ -124,6 +124,9 @@ struct ARViewContainer: UIViewRepresentable {
 }
 
 class ARPlanetCreator {
+    var earthSelfRotationCount: Int = 0
+    var earthRevolutionCount: Int = 0
+    
     func hexStringToUIColor(hex: String) -> UIColor {
         var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
         hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
@@ -147,26 +150,35 @@ class ARPlanetCreator {
         let orbitNode = SCNNode(geometry: orbit)
         return orbitNode
     }
-
+    
     func orbitingNode(forPlanet planetInfo: Planet) -> SCNNode {
         let orbitNode = SCNNode()
-        
+
         // Convert planet's distanceFromSun to an appropriate scale
         let distanceFromSunInScene = CGFloat(planetInfo.distanceFromSun) / 1000.0
 
         // Create and add visual orbit ring
         let orbitRing = createOrbit(radius: distanceFromSunInScene, colorHex: planetInfo.planetColor)
         orbitNode.addChildNode(orbitRing)
-        
-        // Set the planet's position in the orbit node
-        let planetNode = createARPlanet(name: planetInfo.name, data: [planetInfo])
-        planetNode?.position = SCNVector3(distanceFromSunInScene, 0, 0)
-        orbitNode.addChildNode(planetNode!)
+
+        // Create revolution node
+        let revolutionNode = SCNNode()
+        revolutionNode.position = SCNVector3(0, 0, 0)  // Center the revolution node
+        revolutionNode.pivot = SCNMatrix4MakeTranslation(-Float(distanceFromSunInScene), 0, 0)  // Move the pivot away by the radius
+
+        // Create planet and add to the revolution node
+        if let planetNode = createARPlanet(name: planetInfo.name, data: [planetInfo]) {
+            revolutionNode.addChildNode(planetNode)
+        }
+
+        orbitNode.addChildNode(revolutionNode)
 
         // Orbit around the Y-axis of the Sun
         let orbitalDuration = planetInfo.orbitalPeriod / 10.0
+        print("Starting revolution of \(planetInfo.name) with a duration of \(orbitalDuration) seconds.")
+
         let orbitAction = SCNAction.repeatForever(SCNAction.rotate(by: .pi * 2, around: SCNVector3(0, 1, 0), duration: orbitalDuration))
-        orbitNode.runAction(orbitAction)
+        revolutionNode.runAction(orbitAction)
 
         // Apply inclination
         orbitNode.rotation = SCNVector4(1, 0, 0, Float(planetInfo.orbitalInclination).toRadians())
@@ -175,7 +187,8 @@ class ARPlanetCreator {
         return orbitNode
     }
 
-    
+
+
     func createARPlanet(name: String, data: [Planet]) -> SCNNode? {
         guard let planetInfo = data.first(where: { $0.name == name }) else { return nil }
 
@@ -192,6 +205,7 @@ class ARPlanetCreator {
 
         // Planet self rotation
         let selfRotationDuration = planetInfo.rotationPeriod / 10.0
+        
         let selfRotationAction = SCNAction.repeatForever(SCNAction.rotate(by: .pi * 2, around: SCNVector3(0, 1, 0), duration: selfRotationDuration))
         planetNode.runAction(selfRotationAction)
 
