@@ -139,9 +139,7 @@ struct ARViewContainer: UIViewRepresentable {
             
             for planet in parent.planetData where parent.selectedPlanets.contains(planet.name) {
                 if let planetNode = planetCreator.createARPlanet(name: planet.name, data: planet) { // Pass single planet
-                    
-                    
-                    
+                                        
                     planetCreator.applySelfRotation(planetNode: planetNode, planet: planet)
                     planetCreator.animateRevolution(planetNode: planetNode, planet: planet)
                     
@@ -167,16 +165,16 @@ struct ARViewContainer: UIViewRepresentable {
 class ARPlanetCreator {
     var rotationCounts: [String: Int] = [:]
     var revolutionCounts: [String: Int] = [:]
-    
     var speedMultiplier: Float = 86400.0
     
+    // MARK: - Color Helper
     func hexStringToUIColor(hex: String) -> UIColor {
         var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
         hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
         
         var rgb: UInt64 = 0
-        
         Scanner(string: hexSanitized).scanHexInt64(&rgb)
+        
         let red = CGFloat((rgb & 0xFF0000) >> 16) / 255.0
         let green = CGFloat((rgb & 0x00FF00) >> 8) / 255.0
         let blue = CGFloat(rgb & 0x0000FF) / 255.0
@@ -184,8 +182,8 @@ class ARPlanetCreator {
         return UIColor(red: red, green: green, blue: blue, alpha: 1.0)
     }
     
-    func createARPlanet(name: String, data: Planet) -> SCNNode? { // Accept single planet, not array
-        
+    // MARK: - AR Planet Creation
+    func createARPlanet(name: String, data: Planet) -> SCNNode? {
         let diameter = CGFloat(data.diameter)
         let planet = SCNSphere(radius: diameter / 2)
         planet.segmentCount = 550
@@ -196,31 +194,25 @@ class ARPlanetCreator {
         
         let planetNode = SCNNode(geometry: planet)
         planetNode.name = data.name
-        let initialPosition = positionOnOrbit(planet: data, angle: 0)
-        planetNode.position = initialPosition
+        planetNode.position = positionOnOrbit(planet: data, angle: 0)
         
         return planetNode
     }
     
-    
-    // 2. Self-Rotation
+    // MARK: - Self-Rotation
     func applySelfRotation(planetNode: SCNNode, planet: Planet) {
         let adjustedRotationPeriod = planet.rotationPeriod / speedMultiplier
         let rotationAction = SCNAction.rotateBy(x: 0, y: CGFloat(2 * Float.pi), z: 0, duration: TimeInterval(adjustedRotationPeriod))
-        
         let rotationCompletionAction = SCNAction.run { _ in
             self.rotationCounts[planet.name, default: 0] += 1
             print("\(planet.name) has completed \(self.rotationCounts[planet.name]!) self-rotations.")
         }
-        
         let sequence = SCNAction.sequence([rotationAction, rotationCompletionAction])
-        let continuousRotation = SCNAction.repeatForever(sequence)
         
-        planetNode.runAction(continuousRotation)
+        planetNode.runAction(SCNAction.repeatForever(sequence))
     }
     
-    
-    // 3. Revolution around the Sun
+    // MARK: - Revolution Animation
     func animateRevolution(planetNode: SCNNode, planet: Planet) {
         let duration = TimeInterval(planet.orbitalPeriod) / TimeInterval(speedMultiplier)
         let numberOfSteps = 360
@@ -238,67 +230,51 @@ class ARPlanetCreator {
         }
         actions.append(revolutionCompletionAction)
         
-        let revolutionAction = SCNAction.sequence(actions)
-        let continuousRevolution = SCNAction.repeatForever(revolutionAction)
-        
-        planetNode.runAction(continuousRevolution)
+        planetNode.runAction(SCNAction.repeatForever(SCNAction.sequence(actions)))
     }
     
-    // TODO: add color orbit 
+    // MARK: - Orbit Calculation
     func calculateOrbitParameters(planet: Planet, angle: Float) -> (x: Float, y: Float, z: Float, semiMajorAxis: CGFloat, semiMinorAxis: CGFloat) {
         let radians = angle * .pi / 180.0
-        
         let semiMajorAxis = planet.distanceFromSun
         let semiMinorAxis = semiMajorAxis * sqrt(1 - planet.orbitalEccentricitySquared)
-        
         let eccentricAnomaly = 2 * atan(tan(radians / 2) * sqrt((1 - planet.orbitalEccentricitySquared) / (1 + planet.orbitalEccentricity)))
         let distance = semiMajorAxis * (1 - planet.orbitalEccentricitySquared) / (1 + planet.orbitalEccentricity * cos(eccentricAnomaly))
         
         let x = distance * cos(eccentricAnomaly)
         let z = distance * sin(eccentricAnomaly)
-        
-        // Apply the orbital inclination
         let y = sin(eccentricAnomaly) * semiMinorAxis * tan(planet.orbitalInclination * .pi / 180.0)
-        
         
         return (x, y, z, CGFloat(semiMajorAxis), CGFloat(semiMinorAxis))
     }
     
+    // MARK: - Orbit Creation
     func createOrbitForPlanet(planet: Planet) -> SCNNode {
         var vertices: [SCNVector3] = []
         
-        // Iterate over angles and compute orbit positions
         for angle in stride(from: 0, to: 360, by: 1) {
-            let position = positionOnOrbit(planet: planet, angle: Float(angle))
-            vertices.append(position)
+            vertices.append(positionOnOrbit(planet: planet, angle: Float(angle)))
         }
         
-        // Create a geometry source from the vertices
         let source = SCNGeometrySource(vertices: vertices)
-        
-        // Create geometry elements for the source
         var indices: [Int32] = []
+        
         for i in 0..<vertices.count - 1 {
             indices.append(Int32(i))
             indices.append(Int32(i + 1))
         }
-        let element = SCNGeometryElement(indices: indices, primitiveType: .line)
         
-        // Create the geometry and the node
+        let element = SCNGeometryElement(indices: indices, primitiveType: .line)
         let geometry = SCNGeometry(sources: [source], elements: [element])
+        geometry.firstMaterial?.diffuse.contents = hexStringToUIColor(hex: planet.planetColor) // Set orbit color
         
         return SCNNode(geometry: geometry)
     }
     
-    
-    
+    // MARK: - Position On Orbit
     func positionOnOrbit(planet: Planet, angle: Float) -> SCNVector3 {
         let orbitParams = calculateOrbitParameters(planet: planet, angle: angle)
-        if planet.name == "Earth" {
-            print("Earth x: \(orbitParams.x), y: \(orbitParams.y), z: \(orbitParams.z)")
-        }
         return SCNVector3(orbitParams.x , orbitParams.y, orbitParams.z)
     }
-    
 }
 
