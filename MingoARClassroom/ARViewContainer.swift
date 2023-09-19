@@ -198,12 +198,14 @@ class ARPlanetCreator {
     // MARK: - Sun Light
     func addSunlight(to sunNode: SCNNode) {
         let light = SCNLight()
-        light.type = .omni  // Omni light for point light source. Change to .directional for directional light.
-        light.intensity = 2000  // Adjust based on desired brightness.
-        light.temperature = 6500  // Approximate temperature of sunlight in Kelvin.
+        light.type = .omni
+        light.intensity = 2000
+        light.temperature = 6500
         
         sunNode.light = light
+        
     }
+
     
     // MARK: - AR Planet Creation
     func createARPlanet(name: String, data: Planet) -> SCNNode? {
@@ -295,10 +297,17 @@ class ARPlanetCreator {
         
         let element = SCNGeometryElement(indices: indices, primitiveType: .line)
         let geometry = SCNGeometry(sources: [source], elements: [element])
-        geometry.firstMaterial?.diffuse.contents = hexStringToUIColor(hex: planet.planetColor) // Set orbit color
+        
+        let material = SCNMaterial()
+        material.diffuse.contents = hexStringToUIColor(hex: planet.planetColor) // You can choose any color
+        material.lightingModel = .constant // This ensures the line is always the same color regardless of lighting
+        material.isDoubleSided = true
+        geometry.materials = [material]
+        
         
         return SCNNode(geometry: geometry)
     }
+
     
     // MARK: - Position On Orbit
     func positionOnOrbit(planet: Planet, angle: Float) -> SCNVector3 {
@@ -317,7 +326,6 @@ class ARPlanetCreator {
 // planet inclination
 // planets name
 // planet distance to sun
-// orbit not completed,
 // show planet info on select
 // arabic support
 // planets if out of screen
@@ -325,4 +333,4 @@ class ARPlanetCreator {
 // time
 // sound
 // contact , about, privacy version number
-
+// line width 
