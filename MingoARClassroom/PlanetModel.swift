@@ -59,6 +59,7 @@ func loadPlanetData() -> [Planet] {
         for (index, planet) in planets.enumerated() {
             planets[index].rotationPeriod *= 3600 // Convert hours to seconds
             planets[index].orbitalPeriod *= 86400 // Convert days to seconds
+           
             planets[index].perihelion /= 100 // Convert 10^6 km
             planets[index].aphelion /= 100 // Convert 10^6 km
             planets[index].distanceFromSun /= 100 // Convert 10^6 km

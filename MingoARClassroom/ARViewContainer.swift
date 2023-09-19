@@ -139,7 +139,7 @@ struct ARViewContainer: UIViewRepresentable {
             
             for planet in parent.planetData where parent.selectedPlanets.contains(planet.name) {
                 if let planetNode = planetCreator.createARPlanet(name: planet.name, data: planet) { // Pass single planet
-                                        
+                    
                     planetCreator.applySelfRotation(planetNode: planetNode, planet: planet)
                     planetCreator.animateRevolution(planetNode: planetNode, planet: planet)
                     
@@ -148,12 +148,14 @@ struct ARViewContainer: UIViewRepresentable {
                     planetNode.categoryBitMask = planetCategory
                     orbit.categoryBitMask = orbitCategory
                     
-                    
                     parent.solarSystemNode.addChildNode(planetNode)
                     parent.solarSystemNode.addChildNode(orbit)
                     
                 }
             }
+            // Add ambient light to the scene
+            let ambientNode = planetCreator.createAmbientLight()
+            parent.solarSystemNode.addChildNode(ambientNode)
             
             node.addChildNode(parent.solarSystemNode)
             
@@ -182,11 +184,32 @@ class ARPlanetCreator {
         return UIColor(red: red, green: green, blue: blue, alpha: 1.0)
     }
     
+    // MARK: - Ambient Light
+    func createAmbientLight() -> SCNNode {
+        let ambientLight = SCNLight()
+        ambientLight.type = .ambient
+        ambientLight.color = UIColor(white: 0.2, alpha: 1.0) // Adjust to your desired intensity
+        
+        let ambientNode = SCNNode()
+        ambientNode.light = ambientLight
+        return ambientNode
+    }
+    
+    // MARK: - Sun Light
+    func addSunlight(to sunNode: SCNNode) {
+        let light = SCNLight()
+        light.type = .omni  // Omni light for point light source. Change to .directional for directional light.
+        light.intensity = 2000  // Adjust based on desired brightness.
+        light.temperature = 6500  // Approximate temperature of sunlight in Kelvin.
+        
+        sunNode.light = light
+    }
+    
     // MARK: - AR Planet Creation
     func createARPlanet(name: String, data: Planet) -> SCNNode? {
         let diameter = CGFloat(data.diameter)
         let planet = SCNSphere(radius: diameter / 2)
-        planet.segmentCount = 550
+        planet.segmentCount = 150
         
         let material = SCNMaterial()
         material.diffuse.contents = UIImage(named: data.name)
@@ -195,7 +218,10 @@ class ARPlanetCreator {
         let planetNode = SCNNode(geometry: planet)
         planetNode.name = data.name
         planetNode.position = positionOnOrbit(planet: data, angle: 0)
-        
+        // If the Sun is being created, add light to it
+        if data.name == "Sun" {
+            addSunlight(to: planetNode)
+        }
         return planetNode
     }
     
@@ -205,7 +231,6 @@ class ARPlanetCreator {
         let rotationAction = SCNAction.rotateBy(x: 0, y: CGFloat(2 * Float.pi), z: 0, duration: TimeInterval(adjustedRotationPeriod))
         let rotationCompletionAction = SCNAction.run { _ in
             self.rotationCounts[planet.name, default: 0] += 1
-            print("\(planet.name) has completed \(self.rotationCounts[planet.name]!) self-rotations.")
         }
         let sequence = SCNAction.sequence([rotationAction, rotationCompletionAction])
         
@@ -214,6 +239,11 @@ class ARPlanetCreator {
     
     // MARK: - Revolution Animation
     func animateRevolution(planetNode: SCNNode, planet: Planet) {
+        
+        if planet.name == "Sun" {
+            return
+        }
+        
         let duration = TimeInterval(planet.orbitalPeriod) / TimeInterval(speedMultiplier)
         let numberOfSteps = 360
         var actions: [SCNAction] = []
@@ -226,7 +256,6 @@ class ARPlanetCreator {
         
         let revolutionCompletionAction = SCNAction.run { _ in
             self.revolutionCounts[planet.name, default: 0] += 1
-            print("\(planet.name) has completed \(self.revolutionCounts[planet.name]!) revolutions around the Sun.")
         }
         actions.append(revolutionCompletionAction)
         
@@ -277,4 +306,23 @@ class ARPlanetCreator {
         return SCNVector3(orbitParams.x , orbitParams.y, orbitParams.z)
     }
 }
+
+
+
+// MARK: - TODOS
+// without dividing perihelion and perihelion and distanceFromSun, would be the true scale of the universe we cant see the planets
+// random planet
+// sun not glowing and lit
+// color orbit not showing
+// planet inclination
+// planets name
+// planet distance to sun
+// orbit not completed,
+// show planet info on select
+// arabic support
+// planets if out of screen
+// scale for the sun relative to the planet
+// time
+// sound
+// contact , about, privacy version number
 
