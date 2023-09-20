@@ -219,7 +219,8 @@ class ARPlanetCreator {
         
         let planetNode = SCNNode(geometry: planet)
         planetNode.name = data.name
-        planetNode.position = positionOnOrbit(planet: data, angle: 0)
+        planetNode.position = positionOnOrbit(planet: data, angle: data.startingAngle)
+
         // If the Sun is being created, add light to it
         if data.name == "Sun" {
             addSunlight(to: planetNode)
@@ -248,13 +249,16 @@ class ARPlanetCreator {
         
         let duration = TimeInterval(planet.orbitalPeriod) / TimeInterval(speedMultiplier)
         let numberOfSteps = 360
-        var actions: [SCNAction] = []
-        
-        for angle in stride(from: 0, to: 360, by: 360/numberOfSteps) {
-            let nextPosition = positionOnOrbit(planet: planet, angle: Float(angle))
-            let moveAction = SCNAction.move(to: nextPosition, duration: duration / Double(numberOfSteps))
-            actions.append(moveAction)
-        }
+        let startAngle = planet.startingAngle
+         var actions: [SCNAction] = []
+
+         for index in 0..<numberOfSteps {
+             let angle = (startAngle + Float(360 * index / numberOfSteps)).truncatingRemainder(dividingBy: 360)
+             let nextPosition = positionOnOrbit(planet: planet, angle: angle)
+             let moveAction = SCNAction.move(to: nextPosition, duration: duration / Double(numberOfSteps))
+             actions.append(moveAction)
+         }
+
         
         let revolutionCompletionAction = SCNAction.run { _ in
             self.revolutionCounts[planet.name, default: 0] += 1
@@ -283,7 +287,7 @@ class ARPlanetCreator {
     func createOrbitForPlanet(planet: Planet) -> SCNNode {
         var vertices: [SCNVector3] = []
         
-        for angle in stride(from: 0, to: 360, by: 1) {
+        for angle in stride(from: 0, to: 361, by: 1) {
             vertices.append(positionOnOrbit(planet: planet, angle: Float(angle)))
         }
         
@@ -314,13 +318,13 @@ class ARPlanetCreator {
         let orbitParams = calculateOrbitParameters(planet: planet, angle: angle)
         return SCNVector3(orbitParams.x , orbitParams.y, orbitParams.z)
     }
+
 }
 
 
 
 // MARK: - TODOS
 // without dividing perihelion and perihelion and distanceFromSun, would be the true scale of the universe we cant see the planets
-// random planet
 // sun not glowing and lit
 // color orbit not showing
 // planet inclination
@@ -333,4 +337,7 @@ class ARPlanetCreator {
 // time
 // sound
 // contact , about, privacy version number
-// line width 
+// line width
+// pluto material
+// ui helper
+// ui sliders w hek 

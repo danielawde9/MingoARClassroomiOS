@@ -9,6 +9,7 @@ struct Planet: Identifiable, Decodable {
     var distanceFromSun: Float
     var perihelion: Float
     var aphelion: Float
+    var startingAngle: Float
     var orbitalPeriod: Float
     let orbitalVelocity: Float
     let orbitalInclination: Float
