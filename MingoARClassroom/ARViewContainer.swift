@@ -209,33 +209,37 @@ class ARPlanetCreator {
         let diameter = CGFloat(data.diameter)
         let planet = SCNSphere(radius: diameter / 2)
         planet.segmentCount = 150
-
+        
         let material = SCNMaterial()
         material.diffuse.contents = UIImage(named: data.name)
         planet.materials = [material]
-
+        
         let planetNode = SCNNode(geometry: planet)
         planetNode.name = data.name
         planetNode.position = positionOnOrbit(planet: data, angle: data.startingAngle)
-
+        
         // If the Sun is being created, add light to it
         if data.name == "Sun" {
             addSunlight(to: planetNode)
             material.emission.contents = UIImage(named: "Sun") // Assuming the Sun's texture is named "Sun"
             planetNode.filters = addBloom()
+        } else {
+            let inclinationLine = createInclinationLine(for: data)
+            planetNode.addChildNode(inclinationLine)
+            
         }
-
+        
         return planetNode
     }
-
+    
     
     func addBloom() -> [CIFilter]? {
-      let bloomFilter = CIFilter(name:"CIBloom")!
-      bloomFilter.setValue(4.0, forKey: "inputIntensity")
-      bloomFilter.setValue(4.0, forKey: "inputRadius")
-      return [bloomFilter]
+        let bloomFilter = CIFilter(name:"CIBloom")!
+        bloomFilter.setValue(4.0, forKey: "inputIntensity")
+        bloomFilter.setValue(4.0, forKey: "inputRadius")
+        return [bloomFilter]
     }
-
+    
     
     // MARK: - Self-Rotation
     func applySelfRotation(planetNode: SCNNode, planet: Planet) {
@@ -324,24 +328,42 @@ class ARPlanetCreator {
         let orbitParams = calculateOrbitParameters(planet: planet, angle: angle)
         return SCNVector3(orbitParams.x , orbitParams.y, orbitParams.z)
     }
+    
+    // MARK: - Inclination Line
+    func createInclinationLine(for planet: Planet) -> SCNNode {
+        let height = CGFloat(planet.diameter*1.5)
+        let radius: CGFloat = 0.001  // You can adjust this to your desired thickness for the line
+
+        let cylinder = SCNCylinder(radius: radius, height: height)
+        let material = SCNMaterial()
+        material.diffuse.contents = hexStringToUIColor(hex: planet.planetColor)  // Set to your desired color
+        cylinder.materials = [material]
+
+        let node = SCNNode(geometry: cylinder)
+        
+        // The cylinder will initially be vertical. We need to rotate it to match the planet's inclination.
+        let inclinationInRadians = CGFloat(planet.obliquityToOrbit * .pi / 180.0)
+        
+        // Rotate the cylinder about the x-axis to match the planet's inclination.
+        node.rotation = SCNVector4(1, 0, 0, inclinationInRadians)
+        
+        return node
+    }
+
 }
 
 
 
 // MARK: - TODOS
-// without dividing perihelion and perihelion and distanceFromSun, would be the true scale of the universe we cant see the planets
-// planet inclination
+// without dividing perihelion and perihelion and distanceFromSun, would be the true scale of the universe we cant see the planets, also sun scale
 // planets name
 // planet distance to sun
 // show planet info on select
 // arabic support
 // planets if out of screen
-// scale for the sun relative to the planet
 // time
 // sound
 // contact , about, privacy version number
-// line width
-// pluto material
 // ui helper
 // ui sliders w hek
 // when i click earth and scale make the earth middle of the screen to scale
