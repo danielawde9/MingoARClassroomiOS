@@ -61,10 +61,16 @@ func loadPlanetData() -> [Planet] {
             planets[index].rotationPeriod *= 3600 // Convert hours to seconds
             planets[index].orbitalPeriod *= 86400 // Convert days to seconds
            
-            planets[index].perihelion /= 100 // Convert 10^6 km
-            planets[index].aphelion /= 100 // Convert 10^6 km
-            planets[index].distanceFromSun /= 100 // Convert 10^6 km
-            planets[index].diameter /= 100_000 //
+            planets[index].perihelion /= 100 // Convert to 10^8 km
+            planets[index].aphelion /= 100 // Convert 10^8 km
+            planets[index].distanceFromSun /= 100 // Convert 10^8 km
+            planets[index].diameter /= 1e5 // use 1e8 to convert the same
+            
+            
+            // If it's the Sun, adjust its diameter as required
+            if planet.name == "Sun" {
+                planets[index].diameter /= 10 // For example, if you want to make the Sun half its size
+            }
             
         }
         return planets

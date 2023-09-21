@@ -95,9 +95,11 @@ struct ContentView: View {
     // This is the new function to set default selected planets
     func setDefaultSelectedPlanets() {
         for planet in planets {
-            if planet.name != "Sun" {
-                selectedPlanets.insert(planet.id)
-            }
+            selectedPlanets.insert(planet.id)
+
+//            if planet.name != "Sun" {
+//                selectedPlanets.insert(planet.id)
+//            }
         }
     }
 }

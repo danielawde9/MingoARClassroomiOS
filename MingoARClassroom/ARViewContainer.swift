@@ -201,22 +201,19 @@ class ARPlanetCreator {
         light.type = .omni
         light.intensity = 2000
         light.temperature = 6500
-        
         sunNode.light = light
-        
     }
-
     
     // MARK: - AR Planet Creation
     func createARPlanet(name: String, data: Planet) -> SCNNode? {
         let diameter = CGFloat(data.diameter)
         let planet = SCNSphere(radius: diameter / 2)
         planet.segmentCount = 150
-        
+
         let material = SCNMaterial()
         material.diffuse.contents = UIImage(named: data.name)
         planet.materials = [material]
-        
+
         let planetNode = SCNNode(geometry: planet)
         planetNode.name = data.name
         planetNode.position = positionOnOrbit(planet: data, angle: data.startingAngle)
@@ -224,9 +221,21 @@ class ARPlanetCreator {
         // If the Sun is being created, add light to it
         if data.name == "Sun" {
             addSunlight(to: planetNode)
+            material.emission.contents = UIImage(named: "Sun") // Assuming the Sun's texture is named "Sun"
+            planetNode.filters = addBloom()
         }
+
         return planetNode
     }
+
+    
+    func addBloom() -> [CIFilter]? {
+      let bloomFilter = CIFilter(name:"CIBloom")!
+      bloomFilter.setValue(4.0, forKey: "inputIntensity")
+      bloomFilter.setValue(4.0, forKey: "inputRadius")
+      return [bloomFilter]
+    }
+
     
     // MARK: - Self-Rotation
     func applySelfRotation(planetNode: SCNNode, planet: Planet) {
@@ -250,15 +259,14 @@ class ARPlanetCreator {
         let duration = TimeInterval(planet.orbitalPeriod) / TimeInterval(speedMultiplier)
         let numberOfSteps = 360
         let startAngle = planet.startingAngle
-         var actions: [SCNAction] = []
-
-         for index in 0..<numberOfSteps {
-             let angle = (startAngle + Float(360 * index / numberOfSteps)).truncatingRemainder(dividingBy: 360)
-             let nextPosition = positionOnOrbit(planet: planet, angle: angle)
-             let moveAction = SCNAction.move(to: nextPosition, duration: duration / Double(numberOfSteps))
-             actions.append(moveAction)
-         }
-
+        var actions: [SCNAction] = []
+        
+        for index in 0..<numberOfSteps {
+            let angle = (startAngle + Float(360 * index / numberOfSteps)).truncatingRemainder(dividingBy: 360)
+            let nextPosition = positionOnOrbit(planet: planet, angle: angle)
+            let moveAction = SCNAction.move(to: nextPosition, duration: duration / Double(numberOfSteps))
+            actions.append(moveAction)
+        }
         
         let revolutionCompletionAction = SCNAction.run { _ in
             self.revolutionCounts[planet.name, default: 0] += 1
@@ -308,25 +316,20 @@ class ARPlanetCreator {
         material.isDoubleSided = true
         geometry.materials = [material]
         
-        
         return SCNNode(geometry: geometry)
     }
-
     
     // MARK: - Position On Orbit
     func positionOnOrbit(planet: Planet, angle: Float) -> SCNVector3 {
         let orbitParams = calculateOrbitParameters(planet: planet, angle: angle)
         return SCNVector3(orbitParams.x , orbitParams.y, orbitParams.z)
     }
-
 }
 
 
 
 // MARK: - TODOS
 // without dividing perihelion and perihelion and distanceFromSun, would be the true scale of the universe we cant see the planets
-// sun not glowing and lit
-// color orbit not showing
 // planet inclination
 // planets name
 // planet distance to sun
@@ -340,4 +343,5 @@ class ARPlanetCreator {
 // line width
 // pluto material
 // ui helper
-// ui sliders w hek 
+// ui sliders w hek
+// when i click earth and scale make the earth middle of the screen to scale
