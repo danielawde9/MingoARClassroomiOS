@@ -1,7 +1,7 @@
 import SwiftUI
 import CoreHaptics
 
-struct ContentView: View {
+struct MainContentView: View {
     let planets: [Planet] = loadPlanetData()
     @State private var selectedPlanets: Set<String> = []
     @State private var showAlert = false
@@ -27,46 +27,58 @@ struct ContentView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 50, height: 50)
+                            .padding(.trailing, 10) // Add some spacing
                         
-                        // Display the planet name
+                        // Display the planet name with increased font size and weight
                         Text(planet.name)
+                            .font(.headline)
                         
                         Spacer()
                         
                         // Checkbox
-                        Image(systemName: selectedPlanets.contains(planet.id) ? "checkmark.square" : "square")
+                        Image(systemName: selectedPlanets.contains(planet.id) ? "checkmark.square.fill" : "square")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 24, height: 24)
                             .opacity(selectedPlanets.contains(planet.id) ? 1.0 : 0.5)
+                            .foregroundColor(selectedPlanets.contains(planet.id) ? .blue : .gray)
+                            .onTapGesture {
+                                let generator = UIImpactFeedbackGenerator(style: .light)
+                                generator.impactOccurred()
+                                
+                                if selectedPlanets.contains(planet.id) {
+                                    selectedPlanets.remove(planet.id)
+                                } else {
+                                    selectedPlanets.insert(planet.id)
+                                }
+                            }
                     }
+                    .padding(.vertical, 8)
                     .contentShape(Rectangle())
-                    .onTapGesture {
-                        let generator = UIImpactFeedbackGenerator(style: .light)
-                        generator.impactOccurred()
-                        
-                        if selectedPlanets.contains(planet.id) {
-                            selectedPlanets.remove(planet.id)
-                        } else {
-                            selectedPlanets.insert(planet.id)
-                        }
-                    }
-                    .listRowInsets(EdgeInsets())
+                    .listRowInsets(EdgeInsets(top: 10, leading: 0, bottom: 10, trailing: 0))
                     .animation(.default, value: selectedPlanets)
                 }
                 .listStyle(PlainListStyle())
 
+
                 ZStack {
-                    NavigationLink("", destination: ARSceneWithMenu(selectedPlanets: Array(selectedPlanets))
+                    NavigationLink("", destination: ARPlaceView(selectedPlanets: Array(selectedPlanets))
                             .edgesIgnoringSafeArea(.all), isActive: $navigateToAR)
                             .opacity(0)
                             .frame(width: 0, height: 0)
                     
-                    Button(action: proceedButtonAction) {
-                        Text("Proceed")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(selectedPlanets.isEmpty ? Color.gray : Color.blue)
-                            .cornerRadius(10)
+                    VStack(alignment: .leading) {
+                        Button(action: proceedButtonAction) {
+                            Text("Proceed")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity) // Make the button full width
+                                .padding()
+                                .background(selectedPlanets.isEmpty ? Color.gray : Color.blue)
+                                .cornerRadius(10)
+                        }
                     }
+
                     
 
                 }

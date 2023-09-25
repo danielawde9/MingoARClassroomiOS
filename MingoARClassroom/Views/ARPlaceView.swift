@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ARSceneWithMenu: View {
+struct ARPlaceView: View {
     var selectedPlanets: [String]
     
     @State private var isMenuShown = false

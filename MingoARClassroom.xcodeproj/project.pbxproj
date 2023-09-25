@@ -7,28 +7,34 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5662FC5F2AC1CD650010A20B /* ARViewConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5662FC5E2AC1CD650010A20B /* ARViewConfiguration.swift */; };
+		5662FC612AC1CD9F0010A20B /* GestureHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5662FC602AC1CD9F0010A20B /* GestureHandler.swift */; };
+		56837EFF2AC1C7EB009AE49B /* PlanetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56837EFE2AC1C7EB009AE49B /* PlanetManager.swift */; };
 		568EAD492AB45628000E7CC4 /* MingoARClassroomApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568EAD482AB45628000E7CC4 /* MingoARClassroomApp.swift */; };
-		568EAD4B2AB45628000E7CC4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568EAD4A2AB45628000E7CC4 /* ContentView.swift */; };
+		568EAD4B2AB45628000E7CC4 /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568EAD4A2AB45628000E7CC4 /* MainContentView.swift */; };
 		568EAD4D2AB45629000E7CC4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 568EAD4C2AB45629000E7CC4 /* Assets.xcassets */; };
 		568EAD572AB458A0000E7CC4 /* PlanetModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568EAD562AB458A0000E7CC4 /* PlanetModel.swift */; };
 		568EAD712AB463E8000E7CC4 /* planet_data_with_moon.json in Resources */ = {isa = PBXBuildFile; fileRef = 568EAD702AB463E8000E7CC4 /* planet_data_with_moon.json */; };
 		568EAD762AB46B14000E7CC4 /* ARKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 568EAD752AB46B14000E7CC4 /* ARKit.framework */; };
 		568EAD7F2AB4730C000E7CC4 /* ARViewContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568EAD7E2AB4730C000E7CC4 /* ARViewContainer.swift */; };
 		568EAD812AB5A935000E7CC4 /* VisualEffectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568EAD802AB5A935000E7CC4 /* VisualEffectView.swift */; };
-		568EAD832AB5A94B000E7CC4 /* ARSceneWithMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568EAD822AB5A94B000E7CC4 /* ARSceneWithMenu.swift */; };
+		568EAD832AB5A94B000E7CC4 /* ARPlaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568EAD822AB5A94B000E7CC4 /* ARPlaceView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5662FC5E2AC1CD650010A20B /* ARViewConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARViewConfiguration.swift; sourceTree = "<group>"; };
+		5662FC602AC1CD9F0010A20B /* GestureHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureHandler.swift; sourceTree = "<group>"; };
+		56837EFE2AC1C7EB009AE49B /* PlanetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanetManager.swift; sourceTree = "<group>"; };
 		568EAD452AB45628000E7CC4 /* MingoARClassroom.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MingoARClassroom.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		568EAD482AB45628000E7CC4 /* MingoARClassroomApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MingoARClassroomApp.swift; sourceTree = "<group>"; };
-		568EAD4A2AB45628000E7CC4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		568EAD4A2AB45628000E7CC4 /* MainContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainContentView.swift; sourceTree = "<group>"; };
 		568EAD4C2AB45629000E7CC4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		568EAD562AB458A0000E7CC4 /* PlanetModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanetModel.swift; sourceTree = "<group>"; };
 		568EAD702AB463E8000E7CC4 /* planet_data_with_moon.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = planet_data_with_moon.json; sourceTree = "<group>"; };
 		568EAD752AB46B14000E7CC4 /* ARKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ARKit.framework; path = System/Library/Frameworks/ARKit.framework; sourceTree = SDKROOT; };
 		568EAD7E2AB4730C000E7CC4 /* ARViewContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARViewContainer.swift; sourceTree = "<group>"; };
 		568EAD802AB5A935000E7CC4 /* VisualEffectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisualEffectView.swift; sourceTree = "<group>"; };
-		568EAD822AB5A94B000E7CC4 /* ARSceneWithMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARSceneWithMenu.swift; sourceTree = "<group>"; };
+		568EAD822AB5A94B000E7CC4 /* ARPlaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARPlaceView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,12 +69,10 @@
 		568EAD472AB45628000E7CC4 /* MingoARClassroom */ = {
 			isa = PBXGroup;
 			children = (
-				568EAD562AB458A0000E7CC4 /* PlanetModel.swift */,
-				568EAD482AB45628000E7CC4 /* MingoARClassroomApp.swift */,
-				568EAD4A2AB45628000E7CC4 /* ContentView.swift */,
-				568EAD802AB5A935000E7CC4 /* VisualEffectView.swift */,
-				568EAD7E2AB4730C000E7CC4 /* ARViewContainer.swift */,
-				568EAD822AB5A94B000E7CC4 /* ARSceneWithMenu.swift */,
+				56AB0F3E2AC1C2EF00DDA2A8 /* Models */,
+				56AB0F3F2AC1C47F00DDA2A8 /* App */,
+				56AB0F3D2AC1C2AB00DDA2A8 /* Views */,
+				56AB0F402AC1C51000DDA2A8 /* AR */,
 				568EAD4C2AB45629000E7CC4 /* Assets.xcassets */,
 				568EAD702AB463E8000E7CC4 /* planet_data_with_moon.json */,
 			);
@@ -81,6 +85,43 @@
 				568EAD752AB46B14000E7CC4 /* ARKit.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		56AB0F3D2AC1C2AB00DDA2A8 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				568EAD4A2AB45628000E7CC4 /* MainContentView.swift */,
+				568EAD802AB5A935000E7CC4 /* VisualEffectView.swift */,
+				568EAD822AB5A94B000E7CC4 /* ARPlaceView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		56AB0F3E2AC1C2EF00DDA2A8 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				568EAD562AB458A0000E7CC4 /* PlanetModel.swift */,
+				56837EFE2AC1C7EB009AE49B /* PlanetManager.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		56AB0F3F2AC1C47F00DDA2A8 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				568EAD482AB45628000E7CC4 /* MingoARClassroomApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		56AB0F402AC1C51000DDA2A8 /* AR */ = {
+			isa = PBXGroup;
+			children = (
+				568EAD7E2AB4730C000E7CC4 /* ARViewContainer.swift */,
+				5662FC5E2AC1CD650010A20B /* ARViewConfiguration.swift */,
+				5662FC602AC1CD9F0010A20B /* GestureHandler.swift */,
+			);
+			path = AR;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -153,12 +194,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				56837EFF2AC1C7EB009AE49B /* PlanetManager.swift in Sources */,
 				568EAD812AB5A935000E7CC4 /* VisualEffectView.swift in Sources */,
-				568EAD4B2AB45628000E7CC4 /* ContentView.swift in Sources */,
-				568EAD832AB5A94B000E7CC4 /* ARSceneWithMenu.swift in Sources */,
+				5662FC5F2AC1CD650010A20B /* ARViewConfiguration.swift in Sources */,
+				568EAD4B2AB45628000E7CC4 /* MainContentView.swift in Sources */,
+				568EAD832AB5A94B000E7CC4 /* ARPlaceView.swift in Sources */,
 				568EAD7F2AB4730C000E7CC4 /* ARViewContainer.swift in Sources */,
 				568EAD492AB45628000E7CC4 /* MingoARClassroomApp.swift in Sources */,
 				568EAD572AB458A0000E7CC4 /* PlanetModel.swift in Sources */,
+				5662FC612AC1CD9F0010A20B /* GestureHandler.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
