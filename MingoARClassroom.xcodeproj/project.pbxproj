@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		5662FC5F2AC1CD650010A20B /* ARViewConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5662FC5E2AC1CD650010A20B /* ARViewConfiguration.swift */; };
 		5662FC612AC1CD9F0010A20B /* GestureHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5662FC602AC1CD9F0010A20B /* GestureHandler.swift */; };
+		5662FC652AC32A030010A20B /* MainContentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5662FC642AC32A030010A20B /* MainContentViewModel.swift */; };
 		56837EFF2AC1C7EB009AE49B /* PlanetManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56837EFE2AC1C7EB009AE49B /* PlanetManager.swift */; };
 		568EAD492AB45628000E7CC4 /* MingoARClassroomApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568EAD482AB45628000E7CC4 /* MingoARClassroomApp.swift */; };
 		568EAD4B2AB45628000E7CC4 /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 568EAD4A2AB45628000E7CC4 /* MainContentView.swift */; };
@@ -24,6 +25,7 @@
 /* Begin PBXFileReference section */
 		5662FC5E2AC1CD650010A20B /* ARViewConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARViewConfiguration.swift; sourceTree = "<group>"; };
 		5662FC602AC1CD9F0010A20B /* GestureHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureHandler.swift; sourceTree = "<group>"; };
+		5662FC642AC32A030010A20B /* MainContentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainContentViewModel.swift; sourceTree = "<group>"; };
 		56837EFE2AC1C7EB009AE49B /* PlanetManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlanetManager.swift; sourceTree = "<group>"; };
 		568EAD452AB45628000E7CC4 /* MingoARClassroom.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MingoARClassroom.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		568EAD482AB45628000E7CC4 /* MingoARClassroomApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MingoARClassroomApp.swift; sourceTree = "<group>"; };
@@ -49,6 +51,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5662FC662AC32A070010A20B /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				5662FC642AC32A030010A20B /* MainContentViewModel.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
 		568EAD3C2AB45628000E7CC4 = {
 			isa = PBXGroup;
 			children = (
@@ -75,6 +85,7 @@
 				56AB0F402AC1C51000DDA2A8 /* AR */,
 				568EAD4C2AB45629000E7CC4 /* Assets.xcassets */,
 				568EAD702AB463E8000E7CC4 /* planet_data_with_moon.json */,
+				5662FC662AC32A070010A20B /* ViewModel */,
 			);
 			path = MingoARClassroom;
 			sourceTree = "<group>";
@@ -199,6 +210,7 @@
 				5662FC5F2AC1CD650010A20B /* ARViewConfiguration.swift in Sources */,
 				568EAD4B2AB45628000E7CC4 /* MainContentView.swift in Sources */,
 				568EAD832AB5A94B000E7CC4 /* ARPlaceView.swift in Sources */,
+				5662FC652AC32A030010A20B /* MainContentViewModel.swift in Sources */,
 				568EAD7F2AB4730C000E7CC4 /* ARViewContainer.swift in Sources */,
 				568EAD492AB45628000E7CC4 /* MingoARClassroomApp.swift in Sources */,
 				568EAD572AB458A0000E7CC4 /* PlanetModel.swift in Sources */,
