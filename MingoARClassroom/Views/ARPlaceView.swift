@@ -4,24 +4,23 @@ struct ARPlaceView: View {
     var selectedPlanets: [String]
     
     @Environment(\.presentationMode) var presentationMode
-
     
-    @State private var isMenuShown = true
+    @State private var isMenuShown = false
     @State private var sliderValue: Double = 0.5
     @State private var isToggleOn: Bool = true
     @State private var shouldNavigateBack: Bool = false
-
+    
     private let rowHeight: CGFloat = 60
-    private let navigationBarHeight: CGFloat = 100
+    private let navigationBarHeight: CGFloat = 0
     private let buttonSize: CGFloat = 50
     
     var body: some View {
         ZStack {
-            ARViewContainer(selectedPlanets: selectedPlanets)
+            ARViewContainer(selectedPlanets: selectedPlanets).ignoresSafeArea()
             
             NavigationLink("", destination: MainContentView().edgesIgnoringSafeArea(.all), isActive: $shouldNavigateBack)
-                 .opacity(0)
-                 .frame(width: 0, height: 0)
+                .opacity(0)
+                .frame(width: 0, height: 0)
             
             VStack {
                 HStack {
@@ -31,14 +30,14 @@ struct ARPlaceView: View {
                         Image(systemName: "arrow.backward")
                             .foregroundColor(.white)
                             .font(.system(size: 24))
-                            .frame(width: 50, height: 50)
+                            .frame(width: buttonSize+20, height: buttonSize)
                             .background(Color.black.opacity(0.5))
                             .clipShape(RoundedRectangle(cornerSize: CGSize(width: 20, height: 10)))
                     }
-                    .padding(.top, 100)
+                    .padding(.top, navigationBarHeight)
                     .padding(.leading, 20)
                     .navigationBarBackButtonHidden(true)
-
+                    
                     Spacer()
                     
                     Button(action: {
@@ -55,12 +54,11 @@ struct ARPlaceView: View {
                     }
                     .padding(.top, navigationBarHeight) // Adjust the top padding dynamically
                     .padding(.trailing, 20)
-                    .zIndex(1) // Ensure the button is on top
-
+                    
                 }
                 Spacer()
             }
-
+            
             if isMenuShown {
                 VStack {
                     
@@ -121,8 +119,11 @@ struct ARPlaceView: View {
                 }
             }
         }
+        .navigationBarHidden(true) // Hide the navigation bar
+        .statusBar(hidden: true) // Hide the status bar
+        
         .navigationBarBackButtonHidden(true)  // This hides the default back button
-
+        
     }
-
+    
 }
