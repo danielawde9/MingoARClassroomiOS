@@ -161,6 +161,7 @@ struct ARViewContainer: UIViewRepresentable {
 // show planet info on select
 // arabic support
 // planets if out of screen
+// proceed button glass efect
 // time
 // sound
 // contact , about, privacy version number

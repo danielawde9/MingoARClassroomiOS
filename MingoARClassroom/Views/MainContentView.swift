@@ -6,11 +6,9 @@ struct MainContentView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
-            // Title
             Text("Select a Planet")
                 .font(.largeTitle)
                 .fontWeight(.bold)
-            // Subheading
             Text("Choose a planet from the list below to proceed.")
                 .font(.subheadline)
                 .foregroundColor(.gray)
@@ -46,7 +44,7 @@ struct MainContentView: View {
                     }
                 }
                 .listStyle(PlainListStyle())
-
+                
                 ZStack {
                     NavigationLink("", destination: ARPlaceView(selectedPlanets: Array(viewModel.selectedPlanets)), isActive: $viewModel.navigateToAR)
 

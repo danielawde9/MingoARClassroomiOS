@@ -4,7 +4,8 @@ struct ARPlaceView: View {
     var selectedPlanets: [String]
     
     @Environment(\.presentationMode) var presentationMode
-    
+    @Environment(\.colorScheme) var colorScheme
+
     @State private var isMenuShown = false
     @State private var sliderValue: Double = 0.5
     @State private var isToggleOn: Bool = true
@@ -28,11 +29,15 @@ struct ARPlaceView: View {
                         presentationMode.wrappedValue.dismiss()
                     }) {
                         Image(systemName: "arrow.backward")
-                            .foregroundColor(.white)
                             .font(.system(size: 24))
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                             .frame(width: buttonSize+20, height: buttonSize)
-                            .background(Color.black.opacity(0.5))
+                            .background(
+                                colorScheme == .dark ? Color.black.opacity(0.9) : Color.white.opacity(0.9)
+                            )
+                            .cornerRadius(25)  // Moved the cornerRadius here for simplicity
                             .clipShape(RoundedRectangle(cornerSize: CGSize(width: 20, height: 10)))
+
                     }
                     .padding(.top, navigationBarHeight)
                     .padding(.leading, 20)
@@ -46,10 +51,12 @@ struct ARPlaceView: View {
                         }
                     }) {
                         Image(systemName: "list.bullet")
-                            .foregroundColor(.white)
                             .font(.system(size: 24)) // Adjust the size of the image.
+                            .foregroundColor(colorScheme == .dark ? Color.white : Color.black) // Change icon color based on theme
                             .frame(width: buttonSize+20, height: buttonSize) // Explicit frame for consistent size
-                            .background(Color.black.opacity(0.5)) // A bit more transparency to make it more like Apple's design
+                            .background(colorScheme == .dark ?
+                                        Color.black.opacity(0.9).cornerRadius(25) :
+                                        Color.white.opacity(0.9).cornerRadius(25))
                             .clipShape(RoundedRectangle(cornerSize: CGSize(width: 20, height: 10))) // Makes the button round
                     }
                     .padding(.top, navigationBarHeight) // Adjust the top padding dynamically
@@ -80,8 +87,9 @@ struct ARPlaceView: View {
                                 Image(systemName: "xmark")
                                     .resizable()
                                     .scaledToFit()
-                                    .foregroundColor(.white)
+                                    .foregroundColor(colorScheme == .dark ? Color.white : Color.black)
                                     .frame(width: 20, height: 20)
+
                             }
                             .padding(.trailing, 20)
                         }
@@ -89,14 +97,7 @@ struct ARPlaceView: View {
                         Text("Selected Planets")
                             .font(.title2)
                             .fontWeight(.bold)
-                            .foregroundColor(.white)
-                        
-                        Slider(value: $sliderValue, in: 0...1)
-                            .accentColor(.white)
-                        
-                        Toggle("Toggle Label", isOn: $isToggleOn)
-                            .toggleStyle(SwitchToggleStyle())
-                        
+
                         List(selectedPlanets, id: \.self) { planet in
                             HStack {
                                 Image("\(planet)Icon")
@@ -105,25 +106,25 @@ struct ARPlaceView: View {
                                     .frame(width: 50, height: 50)
                                 
                                 Text(planet)
-                                    .foregroundColor(.white)
                                     .font(.headline)
+                                    
                             }
                             .frame(height: rowHeight)
                         }
-                        .listStyle(PlainListStyle())
+                        .listStyle(InsetListStyle())
                     }
                     .padding()
-                    .background(Color.black.opacity(0.7).cornerRadius(25))
+                    .background(colorScheme == .dark ?
+                                Color.black.opacity(0.9).cornerRadius(25) :
+                                Color.white.opacity(0.9).cornerRadius(25))
                     .transition(.move(edge: .bottom))
                     .frame(maxHeight: UIScreen.main.bounds.height / 2)
                 }
             }
         }
-        .navigationBarHidden(true) // Hide the navigation bar
-        .statusBar(hidden: true) // Hide the status bar
-        
-        .navigationBarBackButtonHidden(true)  // This hides the default back button
-        
+        .navigationBarHidden(true)
+        .statusBar(hidden: true)
+        .navigationBarBackButtonHidden(true)
     }
     
 }
